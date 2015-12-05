@@ -6,25 +6,67 @@ imgr = imread('pic430.bmp');
 [ROWS COLS CHANNELS] = size(imgl);
 disimg = [imgl imgr];
 
-image(disimg);
+% image(disimg);
 
 %% 8-point Linear Algorithm
+
 % Given a number of corresponding points, we could
 % use the epipolar constraints to try to recover camera
 % pose (R, T). 
 
 % The relationship between the a point in image 1 and a point in image 2 is
 
-% I1: image 1
-% I2: image 2
+% X1: image 1 (x1, y1, z1)
+% X2: image 2 (x2, y1, z2)
 
-% I1 * Fundamental_Matrix * I2' = 0
+% Epipolar Contraint
+% = X2' * Essential Matrix * X1 = 0
+% Essential Matrix = Rotation(3x3) Translation(3x3)
 
 % xi1, yi1: coords of point in image 1
 % xi2, yi2: coords of point in image 2
 
-% [xi2 yi2 1]  *  [f11 f12 f13]     [xi1]
-%                 [f21 f22 f23]  *  [yi1]   =  0
-%                 [f31 f32 f33]     [ 1 ]
+% [xi2 yi2 1]  *  [e11 e12 e13]     [xi1]
+%                 [e21 e22 e23]  *  [yi1]   =  0
+%                 [e31 e32 e33]     [ 1 ]
+
+% X2' E X1 = 0 can also be written as
+% a' E(stacked) = 0, where
+% a = X1 cross product with x2 and
+% E(stacked) = [e11, e21, e31, e12, e22, e32, e13, e23, e33]
+% a = (x1x2, x1y2, x1z2, y1x2, y1y2, y1z2, z1x2, z1y2, z1z2)'
+% we rewrite the epipolar constraint to seperate the known from the unknown
+% For n point pairs, we can combine this into the linear system
+
+formatSpec = '%f';
+
+% read the points from the file
+file_x1 = fopen('x1', 'r');
+x1 = fscanf(file_x1, formatSpec);
+x1 = reshape(x1, 3, 16)';
+
+file_x2 = fopen('x2', 'r');
+x2 = fscanf(file_x2, formatSpec);
+x2 = reshape(x2, 3, 16)';
+
+% Step 1: Normalization the points
+% The reason for the normalization is to balance the coefficients in the 
+% linear equation system so that it could be less ill-conditioned.
+
+% data normalization (standardization)
+[x1_nmlzd, x1_translation] = normalize(x1);
+[x2_nmlzd, x2_translation] = normalize(x2);
+
+% A is a 9x9 matrix
+A = zeros(9);
+
+
+
+
+
+
+
+
+
 
 
