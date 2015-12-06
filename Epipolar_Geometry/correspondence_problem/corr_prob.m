@@ -60,8 +60,10 @@ x2 = reshape(x2, 3, 16)';
 % A is a 9x9 matrix
 A = zeros(8, 9);
 
-% Step 2: Construct homogeneous system Ax = 0 from X2' * E * X1 = 0
-% a = X1 cross product with X2
+% Step 2: Construct homogeneous system Ax = 0 from X2' * F * X1 = 0
+% x = (f11, f12, f13, f21, f22, f23 f31,f32, f33)' : entries in F
+
+% A = X1 cross product with X2
 
 x1_x1 = x1_nmlzd(:, 1);
 x1_y1 = x1_nmlzd(:, 2);
@@ -81,13 +83,31 @@ A = [x1_x1.*x2_x2   ...
      ones(8, 1)];
  
  
+% Step 3: Obtain estimate F_hat by SVD of A = UDV'
+[U D V] = svd(A, 0);
 
+% x is the column of V corresponding to the least singular value
+x = V(:, end);
 
+F = reshape(x, [3, 3])
 
+% Step 5: Enforce singularity constraint: since Rank(F) = 2
+[U D V] = svd(F);
 
+% Set the smallest singular value to 0: D -> D?
+D(3, 3) = 0;
 
+% F'= UDV' Correct estimate of F :
+F = U * D * V';
 
+% Step 6: [Denormalizing F:]
 
+% Input: Normal Fundamental Matrix F, 
+%        Translation Matrixes x1_translation, x2_translation
 
+% F = x2_translation' * F * x1_translation
 
+% Output: Regular Fundamental Matrix F
+
+F = x2_translation * F * x1_translation;
 

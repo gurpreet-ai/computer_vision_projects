@@ -60,30 +60,34 @@ x2 = reshape(x2, 3, 16)';
 % A is a 9x9 matrix
 A = zeros(8, 9);
 
-% Step 2: Construct homogeneous system Ax = 0 from X2' * E * X1 = 0
-% a = X1 cross product with X2
+% Step 2: Construct homogeneous system Ax = 0 from X2' * F * X1 = 0
+% x = (f11, f12, f13, f21, f22, f23 f31,f32, f33)' : entries in F
 
-x1_x = x1_nmlzd(:, 1);
-x1_y = x1_nmlzd(:, 2);
+% A = X1 cross product with X2
 
-x2_x = x2_nmlzd(:, 1);
-x2_y = x2_nmlzd(:, 2);
+x1_x1 = x1_nmlzd(:, 1);
+x1_y1 = x1_nmlzd(:, 2);
 
-A = [x1_x.*x2_x ...
-     x1_x.*x2_y ...
-     x1_x       ...
-     x1_y.*x2_x ...
+x2_x2 = x2_nmlzd(:, 1);
+x2_y2 = x2_nmlzd(:, 2);
+
+% a = (x1x2, x1y2, x1z2, y1x2, y1y2, y1z2, z1x2, z1y2, z1z2)
+A = [x1_x1.*x2_x2   ...
+     x1_x1.*x2_y2   ...
+     x1_x1          ...
+     x1_y1.*x2_x2   ...
+     x1_y1.*x2_y2   ...
+     x1_y1          ...
+     x2_x2          ...
+     x2_y2          ...
+     ones(8, 1)];
  
-     x2_x       ...
-     x2_y       ...
-     ones(8, 1)]
+ 
+% Step 3: Obtain estimate F_hat by SVD of A = UDV'
+[U D V] = svd(A, 0);
 
+% x is the column of V corresponding to the least singular value
+x = V(:, end);
 
-
-
-
-
-
-
-
+F = 
 
